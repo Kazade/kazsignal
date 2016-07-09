@@ -3,3 +3,4 @@ kazsignal/ring_buffer.h
 CMakeLists.txt
 README.md
 tests/main.cpp
+LICENSE.md
