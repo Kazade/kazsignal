@@ -81,18 +81,59 @@ private:
 class ScopedConnection {
 public:
     ScopedConnection(Connection conn):
-        conn_(conn) {}
+        conn_(conn) {
+
+        counter_ = new int;
+        (*counter_) = 1;
+    }
+
+    ScopedConnection(const ScopedConnection& rhs):
+        counter_(rhs.counter_) {
+        if(counter_) {
+            ++*counter_;
+        }
+    }
+
+    ScopedConnection& operator=(const ScopedConnection& rhs) {
+        if(&rhs == this) {
+            return *this;
+        }
+
+        clear();
+        conn_ = rhs.conn_;
+        counter_ = rhs.counter_;
+
+        if(counter_) {
+            ++*counter_;
+        }
+
+        return *this;
+    }
 
     ~ScopedConnection() {
-        if(conn_.is_connected()) {
-            conn_.disconnect();
-        }
+        clear();
     }
 
     bool is_connected() const { return conn_.is_connected(); }
 
 private:
+    int* counter_ = nullptr;
     Connection conn_;
+
+    void clear() {
+        if(counter_) {
+            if(*counter_ == 1) {
+                if(conn_.is_connected()) {
+                    conn_.disconnect();
+                }
+            }
+
+            if(!--*counter_) {
+                delete counter_;
+                counter_ = nullptr;
+            }
+        }
+    }
 };
 
 template<typename> class ProtoSignal;
