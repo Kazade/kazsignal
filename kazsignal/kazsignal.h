@@ -74,6 +74,10 @@ public:
         return p && p->parent_->connection_exists(*p);
     }
 
+    operator bool() const {
+        return is_connected();
+    }
+
 private:
     std::weak_ptr<ConnectionImpl> impl_;
 };
