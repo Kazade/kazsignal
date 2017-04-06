@@ -193,7 +193,9 @@ public:
     const bool empty() const { return root_.next == &root_; }
     const size_t size() const {
         size_t i = 0;
-        for(auto it: *this) { ++i; }
+        for(auto it = begin(); it != end(); ++it) {
+            ++i;
+        }
         return i;
     }
 
