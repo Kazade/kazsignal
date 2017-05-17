@@ -4,6 +4,7 @@
 #include <memory>
 #include <deque>
 #include <atomic>
+#include <mutex>
 #include <algorithm>
 
 #include "ring_buffer.h"
@@ -153,8 +154,7 @@ public:
     }
 
     Connection connect(const callback& func) {
-        connection_counter_++;
-        size_t id = connection_counter_.load();
+        size_t id = increment_counter();
         auto conn_impl = std::make_shared<ConnectionImpl>(this, id);
         links_.push_back({func, conn_impl});
         return Connection(conn_impl);
@@ -190,7 +190,12 @@ public:
     }
 
 private:
+#ifdef _arch_dreamcast
+    size_t connection_counter_;
+    std::mutex mutex_;
+#else
     std::atomic<size_t> connection_counter_;
+#endif
 
     struct Link {
         callback func;
@@ -198,6 +203,32 @@ private:
     };
 
     threadsafe::ring_buffer<Link> links_;
+
+    inline size_t increment_counter() {
+#ifdef _arch_dreamcast
+        std::lock_guard<std::mutex> lock(mutex_);
+#endif
+        connection_counter_++;
+
+#ifdef _arch_dreamcast
+        return connection_counter_;
+#else
+        return connection_counter_.load();
+#endif
+    }
+
+    inline size_t decrement_counter() {
+#ifdef _arch_dreamcast
+        std::lock_guard<std::mutex> lock(mutex_);
+#endif
+        connection_counter_--;
+
+#ifdef _arch_dreamcast
+        return connection_counter_;
+#else
+        return connection_counter_.load();
+#endif
+    }
 };
 
 template<typename Signature>
