@@ -22,6 +22,8 @@ class ConnectionImpl;
 
 class Disconnector {
 public:
+    virtual ~Disconnector() {}
+
     virtual bool disconnect(const ConnectionImpl& conn) = 0;
     virtual bool connection_exists(const ConnectionImpl& conn) const = 0;
 };
@@ -60,7 +62,10 @@ private:
 
 class Connection {
 public:
-    Connection() {}
+    Connection():
+        impl_({}) {
+
+    }
 
     Connection(std::shared_ptr<ConnectionImpl> impl):
         impl_(impl) {}
@@ -86,14 +91,15 @@ private:
 class ScopedConnection {
 public:
     ScopedConnection(Connection conn):
+        counter_(new int(1)),
         conn_(conn) {
 
-        counter_ = new int;
-        (*counter_) = 1;
     }
 
     ScopedConnection(const ScopedConnection& rhs):
-        counter_(rhs.counter_) {
+        counter_(rhs.counter_),
+        conn_(Connection()) {
+
         if(counter_) {
             ++*counter_;
         }
