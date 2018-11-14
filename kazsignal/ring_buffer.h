@@ -190,8 +190,8 @@ public:
     const_iterator begin() const { return const_iterator(root_.next); }
     const_iterator end() const { return const_iterator(&root_); }
 
-    const bool empty() const { return root_.next == &root_; }
-    const size_t size() const {
+    bool empty() const { return root_.next == &root_; }
+    size_t size() const {
         size_t i = 0;
         for(auto it = begin(); it != end(); ++it) {
             ++i;
