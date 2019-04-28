@@ -12,9 +12,9 @@
 #define DEFINE_SIGNAL(prototype, name) \
     public: \
         prototype& name() { return name##_; } \
+        prototype& name() const { return name##_; } \
     private: \
-        prototype name##_;
-
+        mutable prototype name##_;
 
 namespace sig {
 
