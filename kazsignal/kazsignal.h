@@ -195,6 +195,10 @@ public:
         return size != links_.size();
     }
 
+    std::size_t connection_count() const {
+        return links_.size();
+    }
+
 private:
 #ifdef _arch_dreamcast
     size_t connection_counter_;
