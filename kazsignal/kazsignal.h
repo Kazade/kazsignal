@@ -14,7 +14,7 @@
         prototype& name() { return name##_; } \
         prototype& name() const { return name##_; } \
     private: \
-        mutable prototype name##_;
+        mutable prototype name##_
 
 namespace sig {
 
